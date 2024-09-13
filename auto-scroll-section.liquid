@@ -1,0 +1,103 @@
+{%  stylesheet  %} 
+  .overflow-hidden{
+    overflow: hidden;
+  }
+  .scroll-parent {
+    position: relative;
+    width: 100vw;
+    height: 20rem;
+    padding: 2rem 0;
+    overflow-x: hidden;
+  }
+  
+  .scroll-element {
+    width: inherit;
+    height: inherit;
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  .scroll-element img {
+    width: 15%;
+  }
+  
+  .primary {
+      animation: primary 13s linear infinite;
+  }
+  
+  .secondary {
+    animation: secondary 13s linear infinite;
+  }
+  
+  @keyframes primary {
+    from {
+      left: 0%;
+    }
+    to {
+      left: -100%;
+    }
+  }
+  
+  @keyframes secondary {
+    from {
+      left: 100%;
+    }
+    to {
+      left: 0%;
+    }
+  } {% endstylesheet %} 
+  <div class="container overflow-hidden">
+
+  
+  <div class="scroll-parent">
+          <div class="scroll-element primary">
+            {% for block in section.blocks %}
+              <img
+                src="{{ block.settings.single_img |  img_url: 'original' }}"
+                alt="{{ block.settings.single_img.alt }}"
+            />
+            {% endfor %}
+            
+          </div>
+          
+          <div class="scroll-element secondary">
+            {% for block in section.blocks %}
+              <img
+                src="{{ block.settings.single_img |  img_url: 'original' }}"
+                alt="{{ block.settings.single_img.alt }}"
+            />
+            {% endfor %}
+          </div>
+        </div>
+        </div>
+        {% schema %}
+          {
+            "name": "scrollable gallery",
+            "settings": [
+  
+            ],
+            "blocks": [
+              {
+                "type": "scrollable_gallary",
+                "name": "scrollable gallery",
+                "settings": [
+                  {
+                    "type": "image_picker",
+                    "id": "single_img",
+                    "label": "Select Image"
+                  }
+                ]
+              }
+            ],
+            "presets": [
+              {
+                "name": "scrollable gallery"
+              }
+            ]
+          }
+        {% endschema %}
+        
