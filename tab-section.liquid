@@ -1,1 +1,128 @@
-
+{% stylesheet %}
+    /* tab section */
+    .tab-section {
+      font-family: 'Inter', sans-serif;
+      margin: 50px 0;
+    }
+  
+    .tabs {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    }
+  
+    .tab-btns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: #f8f3f3;
+    }
+  
+    .tab-single-btn {
+      font-family: inter;
+      font-size: 18px;
+      padding: 20px 30px;
+      background: rgb(238, 238, 238);
+      border: none;
+      cursor: pointer;
+    }
+    .tab-single-btn:hover {
+      background: rgb(223, 225, 226);
+    }
+    /* tab btn active class for styling */
+    .tab-single-btn-active {
+      background-color: white;
+    }
+  
+    .tab-single-content {
+      padding: 30px;
+      background: white;
+      border-radius: 5px;
+      display: none;
+    }
+    /* tab single content active class */
+    .tab-single-content-active {
+      display: block;
+    }
+  {% endstylesheet %}
+  
+  <!-- Tab goes here -->
+  <div class="container page-width">
+    <section class="tab-section">
+      <div class="tabs">
+        <div class="tab-btns">
+          {% for block in section.blocks %}
+            <button class="tab-single-btn">{{ block.settings.btn_text }}</button>
+          {% endfor %}
+        </div>
+        <div class="tab-contents">
+          {% for block in section.blocks %}
+            <div class="tab-single-content {% if forloop.first %}tab-single-content-active {% endif %}">
+              {{ block.settings.btn_content }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <script>
+    // tab
+    let tabButtons = document.querySelectorAll('.tab-single-btn');
+    let tabSingleContents = document.querySelectorAll('.tab-single-content');
+  
+    tabButtons.forEach(function (singleBtn, index) {
+      singleBtn.addEventListener('click', function (event) {
+        // when the tab button clicked - remove active classes from all tab btns
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('tab-single-btn-active');
+        });
+  
+        // add the active class to specific button
+        singleBtn.classList.add('tab-single-btn-active');
+  
+        // show the content according to the btn
+        if (tabSingleContents[index].classList.contains('tab-single-content-active')) {
+          // noting happened when this tab is active
+          return;
+        } else {
+          // remove the active class from all tab contents
+          tabSingleContents.forEach((singleContent) => {
+            singleContent.classList.remove('tab-single-content-active');
+          });
+          // add the active class in specific content (by index number)
+          tabSingleContents[index].classList.add('tab-single-content-active');
+        }
+      });
+    });
+  </script>
+  
+  {% schema %}
+  {
+    "name": "tab section",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "tab",
+        "name": "tab",
+        "settings": [
+          {
+            "type": "text",
+            "id": "btn_text",
+            "label": "Btn text"
+          },
+          {
+            "type": "richtext",
+            "id": "btn_content",
+            "label": "Btn Content"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "tab section"
+      }
+    ]
+  }
+  {% endschema %}
+  
