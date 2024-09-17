@@ -1,0 +1,40 @@
+<div id="cart-section">
+  {% section 'cart-template' %}
+</div>
+
+<button id="add-to-cart" data-product-id="{{ product.id }}">
+  Add to Cart
+</button>
+<script>
+document.getElementById('add-to-cart').addEventListener('click', function() {
+  const productId = this.getAttribute('data-product-id');
+  
+  // Add the product to the cart via AJAX
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: productId,
+      quantity: 1,
+    }),
+  })
+  .then(response => response.json())
+  .then(() => {
+    // Fetch the updated cart section
+    fetch('/?sections=cart-template')
+      .then(response => response.json())
+      .then(data => {
+        // Update the cart section with the new HTML
+        document.getElementById('cart-section').innerHTML = data['cart-template'];
+      });
+  })
+  .catch(error => {
+    console.error('Error adding to cart:', error);
+  });
+});
+
+</script>
+
+{% comment %} Source: https://blog.devmoek.com/what-is-section-rendering-api-in-shopify/ {% endcomment %}
