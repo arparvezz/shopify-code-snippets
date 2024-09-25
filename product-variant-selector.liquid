@@ -1,0 +1,104 @@
+{% comment %} 
+  Product Variant selector - Change live url feature
+{% endcomment %}
+
+{% stylesheet %}
+  fieldset {
+    display: flex;
+    gap: 3px;
+    border: none;
+    padding: 20px 0;
+    margin: 0;
+}
+  .variant-radio-btn {
+    display: none;
+}
+.variant-radio-btn-label {
+    padding: 5px;
+    background: black;
+    color: white;
+    cursor: pointer;
+    border: 1px solid #dddeee;
+    transition: .2s ease-in-out;
+}
+.variant-radio-btn-label:hover {
+    background: white;
+    color: black;
+}
+  /* when radio btn active */
+  .variant-radio-btn:checked + .variant-radio-btn-label {
+    background: red;
+    color: black;
+  }
+{% endstylesheet %} 
+
+<input id="product-id" type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+{% if product.variants.size > 1 %}
+  <div class="product-variants-wrapper">
+    {% for option in product.options_with_values %}
+      <fieldset>
+        <legend>{{ option.name }}</legend>
+        {% for value in option.values %}
+          <div>
+            <input
+              type="radio"
+              {% if option.selected_value == value %}
+                checked
+              {% endif %}
+              name="{{ option.name }}"
+              value="{{ value }}"
+              id="{{ option.name |  handleize }}-{{ value |  handleize }}"
+            >
+            <label for="{{ option.name |  handleize }}-{{ value |  handleize }}">{{ value }}</label>
+          </div>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<script>
+  // JavaScript library needed - https://www.jsdelivr.com/package/npm/url-parse
+
+  // Variant selector
+  let product = {{ product | json }}
+  document.querySelectorAll('.product-variants-wrapper input[type="radio"]').forEach( radio => {
+    radio.addEventListener('change', function(event){
+      var selectedOptions = [];
+      document.querySelectorAll('.product-variants-wrapper input[type="radio"]:checked').forEach( radio => {
+        selectedOptions.push(radio.value)
+      })
+      // variant matching here
+      var matchedVariant = product.variants.find(variant => {
+        var pass = true;
+        for(var i = 0 ; i < selectedOptions.length; i++){
+            if(selectedOptions.indexOf(variant.options[i]) === -1){
+              pass = false;
+              break;
+            }
+        }
+        return pass
+      })
+      // change the product id by radio btns values
+      document.querySelector('#product-id').value = matchedVariant.id;
+
+      // change the url
+      var url = new URLParse(window.location.url, true);
+
+      url.query.variant = matchedVariant.id; 
+      window.history.replaceState(null,null,url.toString())
+      console.log(url.toString());
+
+    })
+  })
+
+</script>
+
+{% schema %}
+  {
+    "name": "Variant Selector",
+    "settings": [
+    
+    ]
+  }
+{% endschema %}
