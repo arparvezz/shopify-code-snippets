@@ -1,36 +1,91 @@
-<!-- ============================ --> 
-  <!-- Collection ajax filter - Shopify --> 
-  <!-- ============================ --> 
-   <div class="collection__sort">
-      <select id="sortSelect" onchange="sortCollection()">
-        <option value="default">Default</option>
-        <option value="price-ascending">Price: Low to High</option>
-        <option value="price-descending">Price: High to Low</option>
-        <!-- Add other sort options as needed -->
-      </select>
+<div class="container">
+  <div>
+    <h2>Collection filter goes here.</h2>
+    <select id="sort-by">
+      {% assign sort_by = collection.sort_by | default: collection.default_sort_by %}
+
+      {% for option in collection.sort_options %}
+        <option
+          value="{{ option.value }}"
+          {% if option.value == sort_by %}
+            selected="selected"
+          {% endif %}
+        >
+          {{ option.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+  </div>
+  {% paginate collection.products by 8 %}
+    <div class=" collection-page-grid" id="collectionContainer">
+      {% for product in collection.products %}
+        {% form 'product', product %}
+          <div class="single-product-box">
+            <div class="product-featured-img-box sale-badge">
+              <img
+                class="product-featured-img"
+                src="{{ product.featured_image |  img_url: 'original' }}"
+                alt="{{ product.title }}"
+              >
+            </div>
+            <div class="product-details">
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <input type="hidden" name="quantity" value="1" min="1">
+              <p class="product-vendor">{{ product.vendor }}</p>
+              <a href="{{ product.url }}" class="product-title underline-animation">{{ product.title }}</a>
+              <div class="product-details-inner">
+                <div class="product-price-rating">
+                  <p class="product-price">
+                    {{ product.price | money_with_currency }}
+                    <del>{{ product.compare_at_price | money_with_currency }}</del>
+                  </p>
+                  <div class="star-icon-wrapper">
+                    {% for i in (1..5) %}
+                      <div class="star-icon">
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <button class="add-to-cart-btn" type="submit">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endform %}
+      {% endfor %}
     </div>
+    <div class="pagination-area">
+      {{ paginate | default_pagination }}
+    </div>
+  {% endpaginate %}
+</div>
+</div>
+<script>
+let sort = 'default'; // Default sort value
 
+let sortSelector = document.getElementById('sort-by');
+document.getElementById('sort-by').addEventListener('change', sortCollection)
 
-  <script>
-    let sort = 'default'; // Default sort value
+function sortCollection() {
+  const sortSelect = document.getElementById('sort-by');
+  sort = sortSelect.value;
 
-    function sortCollection() {
-      const sortSelect = document.getElementById('sortSelect');
-      sort = sortSelect.value;
+  fetch('/collections/{{ collection.handle }}?sort_by=' + sort)
+    .then(response => response.text())
+    .then(data => {
+      let htmlDiv = document.createElement('div');
+      htmlDiv.innerHTML = data;
+      console.log(data)
+      // change the html data
+      let htmlDom = htmlDiv.querySelector('#collectionContainer').innerHTML;
+      document.querySelector('#collectionContainer').innerHTML = htmlDom;
 
-      fetch('/collections/{{ collection.handle }}?sort_by=' + sort)
-        .then(response => response.text())
-        .then(data => {
-          let htmlDiv = document.createElement('div');
-          htmlDiv.innerHTML = data;
-
-          // change the html data
-          let htmlDom = htmlDiv.querySelector('#ProductGridContainer').innerHTML;          	             
-          document.querySelector('#ProductGridContainer').innerHTML = htmlDom;
-
-          // Update URL without refreshing the page 
-          history.replaceState(null, null, '?sort_by=' + sort);
-        })
-        .catch(error => console.error('Error:', error));
-    }
-  </script>
+      // Update URL without refreshing the page
+      history.replaceState(null, null, '?sort_by=' + sort);
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
