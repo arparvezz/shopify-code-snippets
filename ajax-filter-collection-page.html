@@ -1,0 +1,36 @@
+<!-- ============================ --> 
+  <!-- Collection ajax filter - Shopify --> 
+  <!-- ============================ --> 
+   <div class="collection__sort">
+      <select id="sortSelect" onchange="sortCollection()">
+        <option value="default">Default</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <!-- Add other sort options as needed -->
+      </select>
+    </div>
+
+
+  <script>
+    let sort = 'default'; // Default sort value
+
+    function sortCollection() {
+      const sortSelect = document.getElementById('sortSelect');
+      sort = sortSelect.value;
+
+      fetch('/collections/{{ collection.handle }}?sort_by=' + sort)
+        .then(response => response.text())
+        .then(data => {
+          let htmlDiv = document.createElement('div');
+          htmlDiv.innerHTML = data;
+
+          // change the html data
+          let htmlDom = htmlDiv.querySelector('#ProductGridContainer').innerHTML;          	             
+          document.querySelector('#ProductGridContainer').innerHTML = htmlDom;
+
+          // Update URL without refreshing the page 
+          history.replaceState(null, null, '?sort_by=' + sort);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
