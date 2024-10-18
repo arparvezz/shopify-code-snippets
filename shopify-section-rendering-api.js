@@ -1,5 +1,6 @@
 // it tested by me
 function updateXDrawer() {
+      // you've to use sections rendering api = "/sections=demo-section-one,demo-section-two" for getting data like .text() => JSON.parse(_) => obj['_']
       fetch("/?sections=x-cart")
             .then(res => res.text())
             .then(result => {
