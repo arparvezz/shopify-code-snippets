@@ -1,0 +1,103 @@
+{%- stylesheet -%}
+  /* css will go there */
+  .c-product-card-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 75px;
+    align-items: center;
+  }
+  .c-featured-img {
+    width: 100%;
+  }
+
+  .c-product-title {
+    font-family: 'Bebas Neue';
+    font-size: 4rem;
+    font-weight: 400;
+    color: #000000;
+    margin: 0;
+  }
+  .c-add-to-cart-btn {
+    font-family: inherit;
+    font-size: 20px;
+    border: 1px solid black;
+    background: black;
+    color: white;
+    padding: 15px 30px;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .c-add-to-cart-btn:hover {
+    background: white;
+    color: black;
+  }
+
+  /* responsive css for mobile + tablet */
+  @media (max-width: 990px) {
+    .c-product-card-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 35px;
+      align-items: center;
+    }
+    .c-product-title {
+      margin-top: 5px;
+    }
+  }
+{%- endstylesheet -%}
+
+{% assign c_product = all_products[section.settings.c_product] %}
+
+<div class="page-width">
+  {% if c_product %}
+    {% form 'product', c_product %}
+      <input type="hidden" name="id" value="{{ c_product.selected_or_first_available_variant.id }}">
+      <input type="hidden" name="quantity" value="1">
+      <div class="c-product-card-wrapper">
+        <div class="c-img-section">
+          <img class="c-featured-img" src="{{ section.settings.c_img | img_url: 'original' }}" alt="">
+        </div>
+        <div class="c-content-section">
+          <h2 class="c-product-title">{{ section.settings.c_title }}</h2>
+          <p class="c-product-description">{{ section.settings.c_description }}</p>
+          <button type="submit" name="add" class="c-add-to-cart-btn">Add to cart</button>
+        </div>
+      </div>
+    {% endform %}
+  {% else %}
+    <p>Product not found. Please select a valid product in the section settings.</p>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Img section product form",
+  "settings": [
+    {
+      "type": "product",
+      "id": "c_product",
+      "label": "Select Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "c_img",
+      "label": "Select Product image"
+    },
+    {
+      "type": "text",
+      "id": "c_title",
+      "label": "Product title"
+    },
+    {
+      "type": "textarea",
+      "id": "c_description",
+      "label": "Product description"
+    }
+  ],
+  "presets": [
+    {
+      "name": "C product card"
+    }
+  ]
+}
+{% endschema %}
