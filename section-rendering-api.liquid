@@ -43,9 +43,11 @@ document.getElementById('add-to-cart').addEventListener('click', function() {
 
 
 {% comment %} Shopify section rendering API, parse content with Domparser {% endcomment %}
+<script>
 fetch('?section_id=cart-main')
 .then(res => res.text())
 .then(data => {
     let temp = new DOMParser().parseFromString(data, 'text/html')
     console.log(temp.querySelector("#shopify-section-cart-main").innerHTML)
 })
+</script>
