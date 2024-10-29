@@ -38,3 +38,14 @@ document.getElementById('add-to-cart').addEventListener('click', function() {
 </script>
 
 {% comment %} Source: https://blog.devmoek.com/what-is-section-rendering-api-in-shopify/ {% endcomment %}
+
+
+
+
+{% comment %} Shopify section rendering API, parse content with Domparser {% endcomment %}
+fetch('?section_id=cart-main')
+.then(res => res.text())
+.then(data => {
+    let temp = new DOMParser().parseFromString(data, 'text/html')
+    console.log(temp.querySelector("#shopify-section-cart-main").innerHTML)
+})
