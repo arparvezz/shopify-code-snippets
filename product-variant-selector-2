@@ -1,0 +1,64 @@
+// product variant selector with select and options
+<!-- product variant selector start -->
+          <div class="product-variant-selector-wrapper">
+            {% unless product.has_only_default_variant %}
+              {% for option in product.options_with_values %}
+                <label>{{ option.name }}</label><br>
+                <select class="single-variant-selector">
+                  {% for value in option.values %}
+                    <option value="{{ value }}">{{ value }}</option>
+                  {% endfor %}
+                </select>
+                <br>
+                <br>
+              {% endfor %}
+            {% endunless %}
+          </div>
+
+          <!-- final variant selector (hidden from ui) which is work for functionality -->
+          <div class="final-variant-selector">
+            {% unless product.has_only_default_variant %}
+              <select name="id" class="base-variant-selector">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}">{{ variant.title }}</option>
+                {% endfor %}
+              </select>
+            {% endunless %}
+          </div>
+
+
+<script>
+// Variant selector
+let singleVariantSelectors = document.querySelectorAll('.single-variant-selector');
+let baseVariantSelector = document.querySelector('.base-variant-selector');
+
+
+
+singleVariantSelectors.forEach(singleSelector => {
+  singleSelector.addEventListener('change',function(event){
+
+        let fullOptionsName = ''
+        document.querySelectorAll('.single-variant-selector').forEach((el,ind)=> {
+          if(document.querySelectorAll('.single-variant-selector').length - 1 == ind){
+            fullOptionsName += el.value
+          }else{
+            fullOptionsName += el.value + ' / '
+          }
+        })
+        
+        // final select / option (hidden from ui) which will work to get variant id
+        let baseOptionsArray = [...baseVariantSelector.options]
+        baseOptionsArray.forEach(s => {
+          if(fullOptionsName == s.innerText){
+            console.log('found')
+            s.selected = 'select'
+            let productTitle = document.querySelector('.product-title')
+            let urlCons = new URLSearchParams(productTitle)
+            window.history.pushState(null,null,`${urlCons}?variant=${s.value}`)
+          }
+        })
+
+  })
+})
+
+</script>
